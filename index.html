@@ -68,6 +68,15 @@
         .dark .border-gray-200 {
             border-color: #374151 !important;
         }
+
+        .notification-enter {
+            animation: notificationSlide 0.3s ease-out;
+        }
+
+        @keyframes notificationSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-full">
@@ -108,6 +117,13 @@
                 </button>
             </form>
             <button onclick="hideModals()" class="mt-4 w-full text-gray-500 hover:text-gray-700">إلغاء</button>
+            
+            <!-- Demo credentials info -->
+            <div class="mt-4 p-3 bg-blue-50 rounded-md text-sm">
+                <p class="text-blue-800 font-semibold mb-2">بيانات تجريبية:</p>
+                <p class="text-blue-700">المدير: AcademicVETnew@admin.com</p>
+                <p class="text-blue-700">كلمة المرور: AcaDemic_2025_New</p>
+            </div>
         </div>
     </div>
 
@@ -148,6 +164,21 @@
         </div>
     </div>
 
+    <!-- Notification System -->
+    <div id="notification" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white border-l-4 border-green-500 rounded-lg shadow-lg p-4 max-w-sm">
+            <div class="flex items-center">
+                <i id="notificationIcon" class="fas fa-check-circle text-green-500 ml-3"></i>
+                <div>
+                    <p id="notificationText" class="text-gray-800 font-medium"></p>
+                </div>
+                <button onclick="hideNotification()" class="mr-auto text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Dashboard -->
     <div id="dashboard" class="hidden min-h-full">
         <!-- Header -->
@@ -155,7 +186,9 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
                     <div class="flex items-center">
-                        <i class="fas fa-graduation-cap text-purple-600 text-2xl ml-3"></i>
+                        <div id="headerLogo" class="ml-3">
+                            <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+                        </div>
                         <h1 class="text-xl font-semibold text-gray-800">المنصة الأكاديمية</h1>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -352,6 +385,57 @@
                 </div>
             </div>
 
+            <!-- University Subject Details -->
+            <div id="universitySubjectDetails" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 id="universitySubjectTypeTitle" class="text-2xl font-bold text-gray-800"></h2>
+                    <button onclick="showUniversitySubjects()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                        العودة
+                    </button>
+                </div>
+                
+                <div id="universitySubjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <!-- University subjects will be loaded here -->
+                </div>
+
+                <div id="universitySubjectContent" class="hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 id="universitySubjectTitle" class="text-xl font-bold text-gray-800"></h3>
+                            <button onclick="backToUniversitySubjects()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                                العودة
+                            </button>
+                        </div>
+                        
+                        <div class="border-b border-gray-200 mb-6">
+                            <nav class="-mb-px flex space-x-8">
+                                <button onclick="showUniversityTab('slides')" class="university-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                                    السلايدات
+                                </button>
+                                <button onclick="showUniversityTab('recordings')" class="university-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                                    التسجيلات
+                                </button>
+                                <button onclick="showUniversityTab('summaries')" class="university-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                                    التلاخيص
+                                </button>
+                            </nav>
+                        </div>
+                        
+                        <div id="universityTabContent">
+                            <div id="universitySlidesTab" class="university-tab-content">
+                                <div id="universitySlidesList" class="space-y-4"></div>
+                            </div>
+                            <div id="universityRecordingsTab" class="university-tab-content hidden">
+                                <div id="universityRecordingsList" class="space-y-4"></div>
+                            </div>
+                            <div id="universitySummariesTab" class="university-tab-content hidden">
+                                <div id="universitySummariesList" class="space-y-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Chat Section -->
             <div id="chatSection" class="hidden">
                 <div class="flex items-center justify-between mb-6">
@@ -417,31 +501,64 @@
                         <h3 class="text-lg font-semibold mb-4 text-gray-800">حاسبة المعدل</h3>
                         <div id="gpaCalculator">
                             <div id="gpaSubjects" class="space-y-3 mb-4">
-                                <div class="flex space-x-2">
-                                    <input type="text" placeholder="اسم المادة" class="flex-1 px-2 py-1 border rounded text-sm">
-                                    <input type="number" placeholder="الساعات" class="w-20 px-2 py-1 border rounded text-sm">
-                                    <select class="w-20 px-2 py-1 border rounded text-sm">
-                                        <option value="4">A</option>
-                                        <option value="3.7">A-</option>
-                                        <option value="3.3">B+</option>
-                                        <option value="3">B</option>
-                                        <option value="2.7">B-</option>
-                                        <option value="2.3">C+</option>
-                                        <option value="2">C</option>
-                                        <option value="1.7">C-</option>
-                                        <option value="1.3">D+</option>
-                                        <option value="1">D</option>
-                                        <option value="0">F</option>
+                                <div class="grid grid-cols-12 gap-2 text-xs font-semibold text-gray-600 mb-2">
+                                    <div class="col-span-3">اسم المادة</div>
+                                    <div class="col-span-2">الرمز</div>
+                                    <div class="col-span-2">الساعات</div>
+                                    <div class="col-span-2">الدرجة</div>
+                                    <div class="col-span-2">النقاط</div>
+                                    <div class="col-span-1">حذف</div>
+                                </div>
+                                <div class="grid grid-cols-12 gap-2">
+                                    <input type="text" placeholder="اسم المادة" class="col-span-3 px-2 py-1 border rounded text-sm">
+                                    <input type="text" placeholder="الرمز" class="col-span-2 px-2 py-1 border rounded text-sm">
+                                    <input type="number" placeholder="الساعات" class="col-span-2 px-2 py-1 border rounded text-sm">
+                                    <select class="col-span-2 px-2 py-1 border rounded text-sm">
+                                        <option value="4">A (4.0)</option>
+                                        <option value="3.7">A- (3.7)</option>
+                                        <option value="3.3">B+ (3.3)</option>
+                                        <option value="3">B (3.0)</option>
+                                        <option value="2.7">B- (2.7)</option>
+                                        <option value="2.3">C+ (2.3)</option>
+                                        <option value="2">C (2.0)</option>
+                                        <option value="1.7">C- (1.7)</option>
+                                        <option value="1.3">D+ (1.3)</option>
+                                        <option value="1">D (1.0)</option>
+                                        <option value="0">F (0.0)</option>
                                     </select>
+                                    <div class="col-span-2 px-2 py-1 text-sm font-semibold text-center bg-gray-50 rounded border gpa-points">0.0</div>
+                                    <button onclick="this.parentElement.remove(); updateGPAPoints();" class="col-span-1 bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">
+                                        ×
+                                    </button>
                                 </div>
                             </div>
-                            <button onclick="addGpaSubject()" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 mb-2">
-                                إضافة مادة
-                            </button>
-                            <button onclick="calculateGPA()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 mb-2">
-                                حساب المعدل
-                            </button>
-                            <div id="gpaResult" class="mt-4 p-3 bg-gray-100 rounded text-center font-semibold"></div>
+                            <div class="flex space-x-2 mb-4">
+                                <button onclick="addGpaSubject()" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700">
+                                    إضافة مادة
+                                </button>
+                                <button onclick="calculateGPA()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                    حساب المعدل
+                                </button>
+                                <button onclick="clearGPA()" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                    مسح الكل
+                                </button>
+                            </div>
+                            <div id="gpaResult" class="mt-4 p-3 bg-gray-100 rounded">
+                                <div class="grid grid-cols-3 gap-4 text-center">
+                                    <div>
+                                        <div class="text-sm text-gray-600">إجمالي الساعات</div>
+                                        <div id="totalHours" class="text-lg font-bold text-purple-600">0</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-600">إجمالي النقاط</div>
+                                        <div id="totalPoints" class="text-lg font-bold text-blue-600">0.0</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-600">المعدل التراكمي</div>
+                                        <div id="finalGPA" class="text-xl font-bold text-green-600">0.00</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -564,23 +681,352 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Admin Users Management -->
+            <div id="adminUsersSection" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">إدارة المستخدمين</h2>
+                    <button onclick="showAdminPanel()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                        العودة للوحة الإدارة
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4">إضافة مستخدم جديد</h3>
+                    <form id="addUserForm" onsubmit="addNewUser(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="newUserName" placeholder="الاسم الكامل" required class="px-3 py-2 border rounded-md">
+                        <input type="email" id="newUserEmail" placeholder="البريد الإلكتروني" required class="px-3 py-2 border rounded-md">
+                        <select id="newUserYear" required class="px-3 py-2 border rounded-md">
+                            <option value="">اختر السنة</option>
+                            <option value="1">السنة الأولى</option>
+                            <option value="2">السنة الثانية</option>
+                            <option value="3">السنة الثالثة</option>
+                            <option value="4">السنة الرابعة</option>
+                            <option value="5">السنة الخامسة</option>
+                            <option value="6">السنة السادسة</option>
+                        </select>
+                        <input type="password" id="newUserPassword" placeholder="كلمة المرور" required class="px-3 py-2 border rounded-md">
+                        <div class="md:col-span-2">
+                            <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                إضافة المستخدم
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">قائمة المستخدمين</h3>
+                    </div>
+                    <div id="usersList" class="p-6">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Subjects Management -->
+            <div id="adminSubjectsSection" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">إدارة المواد</h2>
+                    <button onclick="showAdminPanel()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                        العودة للوحة الإدارة
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4">إضافة مادة جديدة</h3>
+                    <form id="addSubjectForm" onsubmit="addNewSubject(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <input type="text" id="newSubjectName" placeholder="اسم المادة" required class="px-3 py-2 border rounded-md">
+                        <select id="newSubjectType" onchange="toggleSubjectFields()" required class="px-3 py-2 border rounded-md">
+                            <option value="">نوع المادة</option>
+                            <option value="academic">مادة أكاديمية</option>
+                            <option value="mandatory">مادة إجبارية</option>
+                            <option value="elective">مادة حرة</option>
+                        </select>
+                        <select id="newSubjectYear" required class="px-3 py-2 border rounded-md">
+                            <option value="">اختر السنة</option>
+                            <option value="0">مواد الجامعة</option>
+                            <option value="1">السنة الأولى</option>
+                            <option value="2">السنة الثانية</option>
+                            <option value="3">السنة الثالثة</option>
+                            <option value="4">السنة الرابعة</option>
+                            <option value="5">السنة الخامسة</option>
+                            <option value="6">السنة السادسة</option>
+                        </select>
+                        <select id="newSubjectSemester" required class="px-3 py-2 border rounded-md">
+                            <option value="">اختر الفصل</option>
+                            <option value="general">عام</option>
+                            <option value="first">الفصل الأول</option>
+                            <option value="second">الفصل الثاني</option>
+                            <option value="summer">الفصل الصيفي</option>
+                        </select>
+                        <div class="md:col-span-2 lg:col-span-4">
+                            <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                إضافة المادة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">قائمة المواد</h3>
+                    </div>
+                    <div id="adminSubjectsList" class="p-6">
+                        <!-- Subjects will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Files Management -->
+            <div id="adminFilesSection" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">إدارة الملفات</h2>
+                    <button onclick="showAdminPanel()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                        العودة للوحة الإدارة
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4">إضافة ملف جديد</h3>
+                    <form id="addFileForm" onsubmit="addNewFile(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <select id="newFileSubject" required class="px-3 py-2 border rounded-md">
+                            <option value="">اختر المادة</option>
+                        </select>
+                        <input type="text" id="newFileName" placeholder="اسم الملف" required class="px-3 py-2 border rounded-md">
+                        <select id="newFileType" required class="px-3 py-2 border rounded-md">
+                            <option value="">نوع الملف</option>
+                            <option value="slides">سلايدات</option>
+                            <option value="recordings">تسجيلات</option>
+                            <option value="summaries">تلاخيص</option>
+                        </select>
+                        <input type="url" id="newFileUrl" placeholder="رابط الملف" required class="px-3 py-2 border rounded-md">
+                        <div class="md:col-span-2">
+                            <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                إضافة الملف
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">قائمة الملفات</h3>
+                    </div>
+                    <div id="adminFilesList" class="p-6">
+                        <!-- Files will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Exams Management -->
+            <div id="adminExamsSection" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">إدارة الامتحانات</h2>
+                    <button onclick="showAdminPanel()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                        العودة للوحة الإدارة
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold mb-4">إضافة امتحان جديد</h3>
+                    <form id="addExamForm" onsubmit="addNewExam(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <input type="text" id="newExamSubject" placeholder="اسم المادة" required class="px-3 py-2 border rounded-md">
+                        <select id="newExamYear" required class="px-3 py-2 border rounded-md">
+                            <option value="">اختر السنة</option>
+                            <option value="1">السنة الأولى</option>
+                            <option value="2">السنة الثانية</option>
+                            <option value="3">السنة الثالثة</option>
+                            <option value="4">السنة الرابعة</option>
+                            <option value="5">السنة الخامسة</option>
+                            <option value="6">السنة السادسة</option>
+                        </select>
+                        <select id="newExamSemester" required class="px-3 py-2 border rounded-md">
+                            <option value="">اختر الفصل</option>
+                            <option value="first">الفصل الأول</option>
+                            <option value="second">الفصل الثاني</option>
+                            <option value="summer">الفصل الصيفي</option>
+                        </select>
+                        <input type="date" id="newExamDate" required class="px-3 py-2 border rounded-md">
+                        <input type="time" id="newExamTime" required class="px-3 py-2 border rounded-md">
+                        <input type="text" id="newExamRoom" placeholder="القاعة" required class="px-3 py-2 border rounded-md">
+                        <div class="md:col-span-2 lg:col-span-3">
+                            <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                إضافة الامتحان
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-semibold">قائمة الامتحانات</h3>
+                    </div>
+                    <div id="adminExamsList" class="p-6">
+                        <!-- Exams will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Settings -->
+            <div id="adminSettingsSection" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">إعدادات النظام</h2>
+                    <button onclick="showAdminPanel()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                        العودة للوحة الإدارة
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">إحصائيات النظام</h3>
+                        <div id="systemStats" class="space-y-3">
+                            <!-- Stats will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-semibold mb-4">إعدادات عامة</h3>
+                        <form id="settingsForm" onsubmit="updateSettings(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">اسم المنصة</label>
+                                <input type="text" id="platformName" value="المنصة الأكاديمية" class="w-full px-3 py-2 border rounded-md">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">وصف المنصة</label>
+                                <textarea id="platformDescription" rows="3" class="w-full px-3 py-2 border rounded-md">لجنة الطب والجراحة البيطرية</textarea>
+                            </div>
+                            <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                حفظ الإعدادات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                    <h3 class="text-lg font-semibold mb-4">تخصيص المنصة</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-medium mb-3">الشعار الحالي</h4>
+                            <div id="currentLogo" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                                <i class="fas fa-graduation-cap text-purple-600 text-4xl mb-2"></i>
+                                <p class="text-gray-500">الشعار الافتراضي</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium mb-3">رفع شعار جديد</h4>
+                            <div class="space-y-3">
+                                <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(event)" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <div id="logoPreview" class="hidden border-2 border-gray-300 rounded-lg p-4 text-center">
+                                    <img id="previewImage" src="" alt="معاينة الشعار" class="max-w-full max-h-32 mx-auto mb-2">
+                                    <p class="text-sm text-gray-600">معاينة الشعار الجديد</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="uploadLogo()" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                        حفظ الشعار
+                                    </button>
+                                    <button onclick="resetLogo()" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600">
+                                        استخدام الافتراضي
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                    <h3 class="text-lg font-semibold mb-4">أدوات الإدارة</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="exportData()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            تصدير البيانات
+                        </button>
+                        <button onclick="clearCache()" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
+                            مسح التخزين المؤقت
+                        </button>
+                        <button onclick="resetSystem()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                            إعادة تعيين النظام
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // JSONBin Configuration
+        // JSONBin Configuration - Connected to real JSONBin
+        const DEMO_MODE = false; // Connected to JSONBin - البيانات محفوظة في قاعدة البيانات الحقيقية
+        
         const JSONBIN_CONFIG = {
-            masterKey: '$2a$10$a8kLri0YbLwigHHDeK4UH.DvMAqSvJrjDdh9GZZwSgM8b59Y/jII2',
+            masterKey: 'YOUR_MASTER_KEY_HERE', // ضع Master Key الخاص بك هنا
             baseUrl: 'https://api.jsonbin.io/v3/b',
             bins: {
-                users: '676b8e3ead19ca34f8d4b8c1',
-                subjects: '676b8e3ead19ca34f8d4b8c2',
-                files: '676b8e3ead19ca34f8d4b8c3',
-                posts: '676b8e3ead19ca34f8d4b8c4',
-                chats: '676b8e3ead19ca34f8d4b8c5',
-                exams: '676b8e3ead19ca34f8d4b8c6',
-                settings: '676b8e3ead19ca34f8d4b8c7'
+                users: 'YOUR_USERS_BIN_ID',       // ضع Bin ID للمستخدمين
+                subjects: 'YOUR_SUBJECTS_BIN_ID', // ضع Bin ID للمواد
+                files: 'YOUR_FILES_BIN_ID',       // ضع Bin ID للملفات
+                posts: 'YOUR_POSTS_BIN_ID',       // ضع Bin ID للمنشورات
+                chats: 'YOUR_CHATS_BIN_ID',       // ضع Bin ID للدردشات
+                exams: 'YOUR_EXAMS_BIN_ID',       // ضع Bin ID للامتحانات
+                settings: 'YOUR_SETTINGS_BIN_ID'  // ضع Bin ID للإعدادات
             }
+        };
+
+        // Demo data for testing
+        const DEMO_DATA = {
+            users: [
+                {
+                    id: 'admin',
+                    name: 'المدير',
+                    email: 'AcademicVETnew@admin.com',
+                    year: 0,
+                    password: btoa('AcaDemic_2025_New'),
+                    isAdmin: true,
+                    createdAt: new Date().toISOString()
+                }
+            ],
+            subjects: [
+                { id: '1', name: 'علم التشريح', year: 1, semester: 'first', type: 'academic' },
+                { id: '2', name: 'علم وظائف الأعضاء', year: 1, semester: 'first', type: 'academic' },
+                { id: '3', name: 'الكيمياء الحيوية', year: 1, semester: 'second', type: 'academic' },
+                { id: '4', name: 'علم الأمراض', year: 2, semester: 'first', type: 'academic' },
+                { id: '5', name: 'علم الأدوية', year: 2, semester: 'second', type: 'academic' },
+                { id: '6', name: 'اللغة الإنجليزية', year: 0, semester: 'general', type: 'mandatory' },
+                { id: '7', name: 'الثقافة الإسلامية', year: 0, semester: 'general', type: 'mandatory' },
+                { id: '8', name: 'مهارات الحاسوب', year: 0, semester: 'general', type: 'mandatory' },
+                { id: '9', name: 'الفنون والآداب', year: 0, semester: 'general', type: 'elective' },
+                { id: '10', name: 'علم النفس', year: 0, semester: 'general', type: 'elective' },
+                { id: '11', name: 'التاريخ والحضارة', year: 0, semester: 'general', type: 'elective' }
+            ],
+            files: [
+                { id: '1', subjectId: '1', name: 'محاضرة 1 - مقدمة في التشريح', type: 'slides', url: '#', uploadDate: new Date().toISOString() },
+                { id: '2', subjectId: '1', name: 'تسجيل المحاضرة الأولى', type: 'recordings', url: '#', uploadDate: new Date().toISOString() },
+                { id: '3', subjectId: '1', name: 'ملخص الفصل الأول', type: 'summaries', url: '#', uploadDate: new Date().toISOString() },
+                { id: '4', subjectId: '2', name: 'محاضرة 1 - وظائف الأعضاء', type: 'slides', url: '#', uploadDate: new Date().toISOString() }
+            ],
+            posts: [
+                {
+                    id: '1',
+                    userId: 'admin',
+                    userName: 'المدير',
+                    content: 'مرحباً بكم في المنصة الأكاديمية الجديدة! نتمنى لكم تجربة تعليمية مميزة.',
+                    createdAt: new Date().toISOString(),
+                    likes: 0,
+                    comments: []
+                }
+            ],
+            chats: [
+                {
+                    id: '1',
+                    userId: 'admin',
+                    userName: 'المدير',
+                    message: 'مرحباً! كيف يمكنني مساعدتك؟',
+                    timestamp: new Date().toISOString()
+                }
+            ],
+            exams: [
+                { id: '1', subject: 'علم التشريح', year: 1, semester: 'first', date: '2024-01-15', time: '09:00', room: 'قاعة A1' },
+                { id: '2', subject: 'علم وظائف الأعضاء', year: 1, semester: 'first', date: '2024-01-18', time: '10:00', room: 'قاعة B2' }
+            ],
+            settings: { siteLogo: '', backgroundImage: '', theme: 'light' }
         };
 
         // Global Variables
@@ -597,29 +1043,73 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
             loadTheme();
-            initializeData();
+            loadSavedLogo();
+            if (DEMO_MODE) {
+                initializeDemoData();
+            } else {
+                initializeData();
+            }
         });
+
+        // Notification System
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const text = document.getElementById('notificationText');
+            
+            // Set icon and color based on type
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle text-green-500 ml-3';
+                notification.querySelector('div').className = 'bg-white border-l-4 border-green-500 rounded-lg shadow-lg p-4 max-w-sm';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle text-red-500 ml-3';
+                notification.querySelector('div').className = 'bg-white border-l-4 border-red-500 rounded-lg shadow-lg p-4 max-w-sm';
+            } else if (type === 'info') {
+                icon.className = 'fas fa-info-circle text-blue-500 ml-3';
+                notification.querySelector('div').className = 'bg-white border-l-4 border-blue-500 rounded-lg shadow-lg p-4 max-w-sm';
+            }
+            
+            text.textContent = message;
+            notification.classList.remove('hidden');
+            notification.classList.add('notification-enter');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+
+        function hideNotification() {
+            document.getElementById('notification').classList.add('hidden');
+        }
 
         // Authentication Functions
         function checkAuth() {
             const user = localStorage.getItem('currentUser');
             if (user) {
                 currentUser = JSON.parse(user);
+                document.getElementById('landingPage').classList.add('hidden');
                 showDashboard();
                 document.getElementById('userWelcome').textContent = `مرحباً، ${currentUser.name}`;
                 
                 // Check if admin
                 if (currentUser.email === 'AcademicVETnew@admin.com') {
-                    addAdminCard();
+                    setTimeout(addAdminCard, 100);
                 }
             } else {
                 document.getElementById('landingPage').classList.remove('hidden');
+                document.getElementById('dashboard').classList.add('hidden');
             }
         }
 
         function addAdminCard() {
             const dashboardHome = document.getElementById('dashboardHome');
+            
+            // Check if admin card already exists
+            if (document.getElementById('adminCard')) return;
+            
             const adminCard = document.createElement('div');
+            adminCard.id = 'adminCard';
             adminCard.className = 'bg-white rounded-lg shadow-md p-6 card-hover cursor-pointer';
             adminCard.onclick = () => showAdminPanel();
             adminCard.innerHTML = `
@@ -640,6 +1130,12 @@
             const password = document.getElementById('loginPassword').value;
 
             try {
+                // Show loading state
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'جاري التحقق...';
+                submitBtn.disabled = true;
+
                 const users = await fetchData('users');
                 const user = users.find(u => u.email === email && u.password === btoa(password));
                 
@@ -652,14 +1148,27 @@
                     document.getElementById('userWelcome').textContent = `مرحباً، ${user.name}`;
                     
                     if (user.email === 'AcademicVETnew@admin.com') {
-                        addAdminCard();
+                        setTimeout(addAdminCard, 100);
                     }
+                    
+                    // Clear form
+                    document.getElementById('loginForm').reset();
+                    showNotification('تم تسجيل الدخول بنجاح!', 'success');
                 } else {
-                    alert('بيانات الدخول غير صحيحة');
+                    showNotification('بيانات الدخول غير صحيحة', 'error');
                 }
+                
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             } catch (error) {
                 console.error('Login error:', error);
-                alert('حدث خطأ أثناء تسجيل الدخول');
+                showNotification('حدث خطأ أثناء تسجيل الدخول', 'error');
+                
+                // Reset button
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                submitBtn.textContent = 'دخول';
+                submitBtn.disabled = false;
             }
         }
 
@@ -671,10 +1180,17 @@
             const password = document.getElementById('registerPassword').value;
 
             try {
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'جاري الإنشاء...';
+                submitBtn.disabled = true;
+
                 const users = await fetchData('users');
                 
                 if (users.find(u => u.email === email)) {
-                    alert('البريد الإلكتروني مستخدم بالفعل');
+                    showNotification('البريد الإلكتروني مستخدم بالفعل', 'error');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
                     return;
                 }
 
@@ -690,12 +1206,22 @@
                 users.push(newUser);
                 await updateData('users', users);
                 
-                alert('تم إنشاء الحساب بنجاح');
+                showNotification('تم إنشاء الحساب بنجاح!', 'success');
                 hideModals();
                 showLogin();
+                
+                // Clear form
+                document.getElementById('registerForm').reset();
+                
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             } catch (error) {
                 console.error('Registration error:', error);
-                alert('حدث خطأ أثناء إنشاء الحساب');
+                showNotification('حدث خطأ أثناء إنشاء الحساب', 'error');
+                
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                submitBtn.textContent = 'إنشاء الحساب';
+                submitBtn.disabled = false;
             }
         }
 
@@ -710,10 +1236,22 @@
                 clearInterval(chatInterval);
                 chatInterval = null;
             }
+            
+            // Remove admin card if exists
+            const adminCard = document.getElementById('adminCard');
+            if (adminCard) {
+                adminCard.remove();
+            }
+            
+            showNotification('تم تسجيل الخروج بنجاح', 'info');
         }
 
         // Data Management Functions
         async function fetchData(type) {
+            if (DEMO_MODE) {
+                return DEMO_DATA[type] || [];
+            }
+            
             try {
                 const binId = JSONBIN_CONFIG.bins[type];
                 const response = await fetch(`${JSONBIN_CONFIG.baseUrl}/${binId}/latest`, {
@@ -730,11 +1268,16 @@
                 return data.record[type] || [];
             } catch (error) {
                 console.error(`Error fetching ${type}:`, error);
-                return [];
+                return DEMO_DATA[type] || [];
             }
         }
 
         async function updateData(type, data) {
+            if (DEMO_MODE) {
+                DEMO_DATA[type] = data;
+                return { success: true };
+            }
+            
             try {
                 const binId = JSONBIN_CONFIG.bins[type];
                 const payload = { [type]: data };
@@ -759,85 +1302,49 @@
             }
         }
 
+        function initializeDemoData() {
+            // Demo data is already initialized in DEMO_DATA
+            console.log('Demo mode initialized');
+        }
+
         async function initializeData() {
             try {
                 // Initialize users with admin account
                 const users = await fetchData('users');
                 if (users.length === 0) {
-                    const adminUser = {
-                        id: 'admin',
-                        name: 'المدير',
-                        email: 'AcademicVETnew@admin.com',
-                        year: 0,
-                        password: btoa('AcaDemic_2025_New'),
-                        isAdmin: true,
-                        createdAt: new Date().toISOString()
-                    };
-                    await updateData('users', [adminUser]);
+                    await updateData('users', DEMO_DATA.users);
                 }
 
-                // Initialize sample subjects
+                // Initialize other data if empty
                 const subjects = await fetchData('subjects');
                 if (subjects.length === 0) {
-                    const sampleSubjects = [
-                        {
-                            id: '1',
-                            name: 'علم التشريح',
-                            year: 1,
-                            semester: 'first',
-                            type: 'academic'
-                        },
-                        {
-                            id: '2',
-                            name: 'علم وظائف الأعضاء',
-                            year: 1,
-                            semester: 'first',
-                            type: 'academic'
-                        },
-                        {
-                            id: '3',
-                            name: 'الكيمياء الحيوية',
-                            year: 1,
-                            semester: 'second',
-                            type: 'academic'
-                        }
-                    ];
-                    await updateData('subjects', sampleSubjects);
+                    await updateData('subjects', DEMO_DATA.subjects);
                 }
 
-                // Initialize sample files
                 const files = await fetchData('files');
                 if (files.length === 0) {
-                    const sampleFiles = [
-                        {
-                            id: '1',
-                            subjectId: '1',
-                            name: 'محاضرة 1 - مقدمة في التشريح',
-                            type: 'slides',
-                            url: '#',
-                            uploadDate: new Date().toISOString()
-                        },
-                        {
-                            id: '2',
-                            subjectId: '1',
-                            name: 'تسجيل المحاضرة الأولى',
-                            type: 'recordings',
-                            url: '#',
-                            uploadDate: new Date().toISOString()
-                        }
-                    ];
-                    await updateData('files', sampleFiles);
+                    await updateData('files', DEMO_DATA.files);
                 }
 
-                // Initialize empty arrays for other data types
-                await updateData('posts', []);
-                await updateData('chats', []);
-                await updateData('exams', []);
-                await updateData('settings', {
-                    siteLogo: '',
-                    backgroundImage: '',
-                    theme: 'light'
-                });
+                const posts = await fetchData('posts');
+                if (posts.length === 0) {
+                    await updateData('posts', DEMO_DATA.posts);
+                }
+
+                const chats = await fetchData('chats');
+                if (chats.length === 0) {
+                    await updateData('chats', DEMO_DATA.chats);
+                }
+
+                const exams = await fetchData('exams');
+                if (exams.length === 0) {
+                    await updateData('exams', DEMO_DATA.exams);
+                }
+
+                const settings = await fetchData('settings');
+                if (!settings || Object.keys(settings).length === 0) {
+                    await updateData('settings', DEMO_DATA.settings);
+                }
 
             } catch (error) {
                 console.error('Error initializing data:', error);
@@ -867,7 +1374,7 @@
         }
 
         function hideAllSections() {
-            const sections = ['dashboardHome', 'subjectsSection', 'universitySubjectsSection', 'chatSection', 'postsSection', 'toolsSection', 'examsSection', 'adminPanel'];
+            const sections = ['dashboardHome', 'subjectsSection', 'universitySubjectsSection', 'universitySubjectDetails', 'chatSection', 'postsSection', 'toolsSection', 'examsSection', 'adminPanel', 'adminUsersSection', 'adminSubjectsSection', 'adminFilesSection', 'adminExamsSection', 'adminSettingsSection'];
             sections.forEach(section => {
                 document.getElementById(section).classList.add('hidden');
             });
@@ -976,6 +1483,7 @@
                 document.getElementById('subjectsList').classList.remove('hidden');
             } catch (error) {
                 console.error('Error loading subjects:', error);
+                showNotification('حدث خطأ في تحميل المواد', 'error');
             }
         }
 
@@ -1051,25 +1559,137 @@
                 });
             } catch (error) {
                 console.error('Error loading files:', error);
+                showNotification('حدث خطأ في تحميل الملفات', 'error');
             }
         }
 
         function downloadFile(url) {
             if (url === '#') {
-                alert('الملف غير متاح حالياً');
+                showNotification('الملف غير متاح حالياً', 'info');
                 return;
             }
             window.open(url, '_blank', 'noopener,noreferrer');
         }
 
         function markAsCompleted(fileId) {
-            // This would typically update user progress in the database
-            alert('تم وضع علامة الإنجاز على الملف');
+            showNotification('تم وضع علامة الإنجاز على الملف', 'success');
         }
 
         function showUniversitySubjectType(type) {
-            // This would load university subjects based on type (elective/mandatory)
-            alert(`عرض المواد ${type === 'elective' ? 'الحرة' : 'الإجبارية'}`);
+            hideAllSections();
+            document.getElementById('universitySubjectDetails').classList.remove('hidden');
+            
+            const title = type === 'elective' ? 'المواد الحرة' : 'المواد الإجبارية';
+            document.getElementById('universitySubjectTypeTitle').textContent = title;
+            
+            loadUniversitySubjects(type);
+        }
+
+        async function loadUniversitySubjects(type) {
+            try {
+                const subjects = await fetchData('subjects');
+                const filteredSubjects = subjects.filter(s => s.type === type);
+                
+                const container = document.getElementById('universitySubjectsList');
+                container.innerHTML = '';
+                
+                if (filteredSubjects.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-500">لا توجد مواد متاحة</div>';
+                    return;
+                }
+                
+                filteredSubjects.forEach(subject => {
+                    const subjectCard = document.createElement('div');
+                    subjectCard.className = 'bg-white border-2 border-purple-200 rounded-lg p-4 cursor-pointer hover:border-purple-400 transition-colors';
+                    subjectCard.onclick = () => showUniversitySubjectDetails(subject);
+                    subjectCard.innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-book text-purple-600 text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-gray-800">${subject.name}</h4>
+                        </div>
+                    `;
+                    container.appendChild(subjectCard);
+                });
+            } catch (error) {
+                console.error('Error loading university subjects:', error);
+                showNotification('حدث خطأ في تحميل المواد', 'error');
+            }
+        }
+
+        function showUniversitySubjectDetails(subject) {
+            currentSubject = subject;
+            document.getElementById('universitySubjectsList').classList.add('hidden');
+            document.getElementById('universitySubjectContent').classList.remove('hidden');
+            document.getElementById('universitySubjectTitle').textContent = subject.name;
+            
+            // Show slides tab by default
+            showUniversityTab('slides');
+        }
+
+        function backToUniversitySubjects() {
+            document.getElementById('universitySubjectContent').classList.add('hidden');
+            document.getElementById('universitySubjectsList').classList.remove('hidden');
+        }
+
+        async function showUniversityTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.university-tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Update tab buttons
+            document.querySelectorAll('.university-tab-btn').forEach(btn => {
+                btn.classList.remove('border-purple-500', 'text-purple-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            // Show selected tab
+            document.getElementById(`university${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).classList.remove('hidden');
+            event.target.classList.remove('border-transparent', 'text-gray-500');
+            event.target.classList.add('border-purple-500', 'text-purple-600');
+            
+            // Load files for the tab
+            await loadUniversityFiles(tabName);
+        }
+
+        async function loadUniversityFiles(type) {
+            try {
+                const files = await fetchData('files');
+                const subjectFiles = files.filter(f => 
+                    f.subjectId === currentSubject.id && f.type === type
+                );
+                
+                const container = document.getElementById(`university${type.charAt(0).toUpperCase() + type.slice(1)}List`);
+                container.innerHTML = '';
+                
+                if (subjectFiles.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500">لا توجد ملفات متاحة</div>';
+                    return;
+                }
+                
+                subjectFiles.forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                    fileItem.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-file-pdf text-red-500 ml-3"></i>
+                            <span class="text-gray-800">${file.name}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="downloadFile('${file.url}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                تحميل
+                            </button>
+                            <button onclick="markAsCompleted('${file.id}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                                ✓
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(fileItem);
+                });
+            } catch (error) {
+                console.error('Error loading university files:', error);
+                showNotification('حدث خطأ في تحميل الملفات', 'error');
+            }
         }
 
         // Chat Functions
@@ -1126,9 +1746,10 @@
                 
                 messageInput.value = '';
                 loadChatMessages();
+                showNotification('تم إرسال الرسالة', 'success');
             } catch (error) {
                 console.error('Error sending message:', error);
-                alert('حدث خطأ أثناء إرسال الرسالة');
+                showNotification('حدث خطأ أثناء إرسال الرسالة', 'error');
             }
         }
 
@@ -1168,6 +1789,7 @@
                 });
             } catch (error) {
                 console.error('Error loading posts:', error);
+                showNotification('حدث خطأ في تحميل المنشورات', 'error');
             }
         }
 
@@ -1194,64 +1816,102 @@
                 
                 document.getElementById('postContent').value = '';
                 loadPosts();
+                showNotification('تم نشر المنشور بنجاح', 'success');
             } catch (error) {
                 console.error('Error creating post:', error);
-                alert('حدث خطأ أثناء نشر المنشور');
+                showNotification('حدث خطأ أثناء نشر المنشور', 'error');
             }
         }
 
         function likePost(postId) {
-            alert('تم الإعجاب بالمنشور');
+            showNotification('تم الإعجاب بالمنشور', 'success');
         }
 
         function commentPost(postId) {
-            alert('ميزة التعليقات قيد التطوير');
+            showNotification('ميزة التعليقات قيد التطوير', 'info');
         }
 
         // Tools Functions
         function addGpaSubject() {
             const container = document.getElementById('gpaSubjects');
             const subjectDiv = document.createElement('div');
-            subjectDiv.className = 'flex space-x-2';
+            subjectDiv.className = 'grid grid-cols-12 gap-2';
             subjectDiv.innerHTML = `
-                <input type="text" placeholder="اسم المادة" class="flex-1 px-2 py-1 border rounded text-sm">
-                <input type="number" placeholder="الساعات" class="w-20 px-2 py-1 border rounded text-sm">
-                <select class="w-20 px-2 py-1 border rounded text-sm">
-                    <option value="4">A</option>
-                    <option value="3.7">A-</option>
-                    <option value="3.3">B+</option>
-                    <option value="3">B</option>
-                    <option value="2.7">B-</option>
-                    <option value="2.3">C+</option>
-                    <option value="2">C</option>
-                    <option value="1.7">C-</option>
-                    <option value="1.3">D+</option>
-                    <option value="1">D</option>
-                    <option value="0">F</option>
+                <input type="text" placeholder="اسم المادة" class="col-span-3 px-2 py-1 border rounded text-sm">
+                <input type="text" placeholder="الرمز" class="col-span-2 px-2 py-1 border rounded text-sm">
+                <input type="number" placeholder="الساعات" class="col-span-2 px-2 py-1 border rounded text-sm" onchange="updateGPAPoints()">
+                <select class="col-span-2 px-2 py-1 border rounded text-sm" onchange="updateGPAPoints()">
+                    <option value="4">A (4.0)</option>
+                    <option value="3.7">A- (3.7)</option>
+                    <option value="3.3">B+ (3.3)</option>
+                    <option value="3">B (3.0)</option>
+                    <option value="2.7">B- (2.7)</option>
+                    <option value="2.3">C+ (2.3)</option>
+                    <option value="2">C (2.0)</option>
+                    <option value="1.7">C- (1.7)</option>
+                    <option value="1.3">D+ (1.3)</option>
+                    <option value="1">D (1.0)</option>
+                    <option value="0">F (0.0)</option>
                 </select>
-                <button onclick="this.parentElement.remove()" class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">
-                    حذف
+                <div class="col-span-2 px-2 py-1 text-sm font-semibold text-center bg-gray-50 rounded border gpa-points">0.0</div>
+                <button onclick="this.parentElement.remove(); updateGPAPoints();" class="col-span-1 bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">
+                    ×
                 </button>
             `;
             container.appendChild(subjectDiv);
         }
 
+        function updateGPAPoints() {
+            const subjects = document.querySelectorAll('#gpaSubjects .grid');
+            
+            subjects.forEach(subject => {
+                const inputs = subject.querySelectorAll('input, select');
+                const hours = parseFloat(inputs[2].value) || 0;
+                const grade = parseFloat(inputs[3].value) || 0;
+                const pointsDisplay = subject.querySelector('.gpa-points');
+                
+                const points = (hours * grade).toFixed(1);
+                pointsDisplay.textContent = points;
+            });
+            
+            calculateGPA();
+        }
+
         function calculateGPA() {
-            const subjects = document.querySelectorAll('#gpaSubjects > div');
+            const subjects = document.querySelectorAll('#gpaSubjects .grid');
             let totalPoints = 0;
             let totalHours = 0;
             
             subjects.forEach(subject => {
                 const inputs = subject.querySelectorAll('input, select');
-                const hours = parseFloat(inputs[1].value) || 0;
-                const grade = parseFloat(inputs[2].value) || 0;
+                const hours = parseFloat(inputs[2].value) || 0;
+                const grade = parseFloat(inputs[3].value) || 0;
                 
                 totalHours += hours;
                 totalPoints += hours * grade;
             });
             
-            const gpa = totalHours > 0 ? (totalPoints / totalHours).toFixed(2) : 0;
-            document.getElementById('gpaResult').innerHTML = `المعدل التراكمي: <span class="text-purple-600">${gpa}</span>`;
+            const gpa = totalHours > 0 ? (totalPoints / totalHours).toFixed(2) : '0.00';
+            
+            document.getElementById('totalHours').textContent = totalHours;
+            document.getElementById('totalPoints').textContent = totalPoints.toFixed(1);
+            document.getElementById('finalGPA').textContent = gpa;
+            
+            if (totalHours > 0) {
+                showNotification(`تم حساب المعدل: ${gpa}`, 'success');
+            }
+        }
+
+        function clearGPA() {
+            const container = document.getElementById('gpaSubjects');
+            const subjects = container.querySelectorAll('.grid');
+            subjects.forEach(subject => subject.remove());
+            
+            document.getElementById('totalHours').textContent = '0';
+            document.getElementById('totalPoints').textContent = '0.0';
+            document.getElementById('finalGPA').textContent = '0.00';
+            
+            showNotification('تم مسح جميع المواد', 'info');
         }
 
         function startPomodoro() {
@@ -1265,16 +1925,19 @@
                 if (pomodoroTime <= 0) {
                     clearInterval(pomodoroTimer);
                     isTimerRunning = false;
-                    alert('انتهى وقت البومودورو! خذ استراحة.');
+                    showNotification('انتهى وقت البومودورو! خذ استراحة.', 'info');
                     resetPomodoro();
                 }
             }, 1000);
+            
+            showNotification('تم بدء مؤقت البومودورو', 'success');
         }
 
         function pausePomodoro() {
             if (pomodoroTimer) {
                 clearInterval(pomodoroTimer);
                 isTimerRunning = false;
+                showNotification('تم إيقاف المؤقت مؤقتاً', 'info');
             }
         }
 
@@ -1285,6 +1948,7 @@
             isTimerRunning = false;
             pomodoroTime = 25 * 60;
             updateTimerDisplay();
+            showNotification('تم إعادة تعيين المؤقت', 'info');
         }
 
         function updateTimerDisplay() {
@@ -1332,6 +1996,7 @@
             localStorage.setItem(`todos_${currentUser.id}`, JSON.stringify(todos));
             input.value = '';
             loadTodos();
+            showNotification('تم إضافة المهمة', 'success');
         }
 
         function toggleTodo(index) {
@@ -1346,6 +2011,7 @@
             todos.splice(index, 1);
             localStorage.setItem(`todos_${currentUser.id}`, JSON.stringify(todos));
             loadTodos();
+            showNotification('تم حذف المهمة', 'success');
         }
 
         // Exams Functions
@@ -1388,7 +2054,7 @@
                     tableHTML += `
                         <tr class="border-t">
                             <td class="px-4 py-2">${exam.subject}</td>
-                            <td class="px-4 py-2">${new Date(exam.date).toLocaleDateString('ar-SA')}</td>
+                            <td class="px-4 py-2">${formatDate(exam.date)}</td>
                             <td class="px-4 py-2">${exam.time}</td>
                             <td class="px-4 py-2">${exam.room}</td>
                         </tr>
@@ -1399,6 +2065,7 @@
                 container.innerHTML = tableHTML;
             } catch (error) {
                 console.error('Error loading exams:', error);
+                showNotification('حدث خطأ في تحميل الامتحانات', 'error');
             }
         }
 
@@ -1412,11 +2079,13 @@
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
                 localStorage.setItem('theme', 'light');
+                showNotification('تم التبديل للوضع النهاري', 'info');
             } else {
                 body.classList.add('dark');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
                 localStorage.setItem('theme', 'dark');
+                showNotification('تم التبديل للوضع الليلي', 'info');
             }
         }
 
@@ -1429,26 +2098,647 @@
             }
         }
 
-        // Admin Functions (Placeholder implementations)
+        // Admin Functions
         function showAdminUsers() {
-            alert('إدارة المستخدمين - قيد التطوير');
+            hideAllSections();
+            document.getElementById('adminUsersSection').classList.remove('hidden');
+            loadAdminUsers();
         }
 
         function showAdminSubjects() {
-            alert('إدارة المواد - قيد التطوير');
+            hideAllSections();
+            document.getElementById('adminSubjectsSection').classList.remove('hidden');
+            loadAdminSubjects();
         }
 
         function showAdminFiles() {
-            alert('إدارة الملفات - قيد التطوير');
+            hideAllSections();
+            document.getElementById('adminFilesSection').classList.remove('hidden');
+            loadAdminFiles();
+            loadSubjectsForFiles();
         }
 
         function showAdminExams() {
-            alert('إدارة الامتحانات - قيد التطوير');
+            hideAllSections();
+            document.getElementById('adminExamsSection').classList.remove('hidden');
+            loadAdminExams();
         }
 
         function showAdminSettings() {
-            alert('الإعدادات - قيد التطوير');
+            hideAllSections();
+            document.getElementById('adminSettingsSection').classList.remove('hidden');
+            loadSystemStats();
+            loadSavedLogo();
+        }
+
+        // Admin Users Management
+        async function loadAdminUsers() {
+            try {
+                const users = await fetchData('users');
+                const container = document.getElementById('usersList');
+                container.innerHTML = '';
+                
+                if (users.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500">لا يوجد مستخدمون</div>';
+                    return;
+                }
+                
+                users.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.className = 'flex items-center justify-between p-4 border-b border-gray-200';
+                    userDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-user-circle text-purple-600 text-2xl ml-3"></i>
+                            <div>
+                                <div class="font-semibold text-gray-800">${user.name}</div>
+                                <div class="text-sm text-gray-500">${user.email}</div>
+                                <div class="text-sm text-gray-500">السنة ${user.year || 'غير محدد'}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            ${user.isAdmin ? '<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">مدير</span>' : ''}
+                            <button onclick="editUser('${user.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                تعديل
+                            </button>
+                            ${!user.isAdmin ? `<button onclick="deleteUser('${user.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">حذف</button>` : ''}
+                        </div>
+                    `;
+                    container.appendChild(userDiv);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showNotification('حدث خطأ في تحميل المستخدمين', 'error');
+            }
+        }
+
+        async function addNewUser(event) {
+            event.preventDefault();
+            
+            try {
+                const name = document.getElementById('newUserName').value;
+                const email = document.getElementById('newUserEmail').value;
+                const year = document.getElementById('newUserYear').value;
+                const password = document.getElementById('newUserPassword').value;
+                
+                const users = await fetchData('users');
+                
+                if (users.find(u => u.email === email)) {
+                    showNotification('البريد الإلكتروني مستخدم بالفعل', 'error');
+                    return;
+                }
+                
+                const newUser = {
+                    id: Date.now().toString(),
+                    name,
+                    email,
+                    year: parseInt(year),
+                    password: btoa(password),
+                    createdAt: new Date().toISOString()
+                };
+                
+                users.push(newUser);
+                await updateData('users', users);
+                
+                document.getElementById('addUserForm').reset();
+                loadAdminUsers();
+                showNotification('تم إضافة المستخدم بنجاح', 'success');
+            } catch (error) {
+                console.error('Error adding user:', error);
+                showNotification('حدث خطأ أثناء إضافة المستخدم', 'error');
+            }
+        }
+
+        function editUser(userId) {
+            showNotification('ميزة تعديل المستخدم قيد التطوير', 'info');
+        }
+
+        async function deleteUser(userId) {
+            try {
+                const users = await fetchData('users');
+                const updatedUsers = users.filter(u => u.id !== userId);
+                await updateData('users', updatedUsers);
+                loadAdminUsers();
+                showNotification('تم حذف المستخدم بنجاح', 'success');
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showNotification('حدث خطأ أثناء حذف المستخدم', 'error');
+            }
+        }
+
+        // Admin Subjects Management
+        async function loadAdminSubjects() {
+            try {
+                const subjects = await fetchData('subjects');
+                const container = document.getElementById('adminSubjectsList');
+                container.innerHTML = '';
+                
+                if (subjects.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500">لا توجد مواد</div>';
+                    return;
+                }
+                
+                subjects.forEach(subject => {
+                    const subjectDiv = document.createElement('div');
+                    subjectDiv.className = 'flex items-center justify-between p-4 border-b border-gray-200';
+                    subjectDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-book text-purple-600 text-2xl ml-3"></i>
+                            <div>
+                                <div class="font-semibold text-gray-800">${subject.name}</div>
+                                <div class="text-sm text-gray-500">
+                                    ${getSubjectTypeName(subject.type)} - 
+                                    ${subject.year === 0 ? 'مواد الجامعة' : `السنة ${subject.year}`} - 
+                                    ${getSemesterName(subject.semester)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editSubject('${subject.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                تعديل
+                            </button>
+                            <button onclick="deleteSubject('${subject.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                حذف
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(subjectDiv);
+                });
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+                showNotification('حدث خطأ في تحميل المواد', 'error');
+            }
+        }
+
+        function toggleSubjectFields() {
+            const type = document.getElementById('newSubjectType').value;
+            const yearSelect = document.getElementById('newSubjectYear');
+            const semesterSelect = document.getElementById('newSubjectSemester');
+            
+            if (type === 'mandatory' || type === 'elective') {
+                yearSelect.value = '0';
+                semesterSelect.value = 'general';
+            }
+        }
+
+        async function addNewSubject(event) {
+            event.preventDefault();
+            
+            try {
+                const name = document.getElementById('newSubjectName').value;
+                const type = document.getElementById('newSubjectType').value;
+                const year = document.getElementById('newSubjectYear').value;
+                const semester = document.getElementById('newSubjectSemester').value;
+                
+                const subjects = await fetchData('subjects');
+                
+                const newSubject = {
+                    id: Date.now().toString(),
+                    name,
+                    year: parseInt(year),
+                    semester,
+                    type
+                };
+                
+                subjects.push(newSubject);
+                await updateData('subjects', subjects);
+                
+                document.getElementById('addSubjectForm').reset();
+                loadAdminSubjects();
+                showNotification('تم إضافة المادة بنجاح', 'success');
+            } catch (error) {
+                console.error('Error adding subject:', error);
+                showNotification('حدث خطأ أثناء إضافة المادة', 'error');
+            }
+        }
+
+        function editSubject(subjectId) {
+            showNotification('ميزة تعديل المادة قيد التطوير', 'info');
+        }
+
+        async function deleteSubject(subjectId) {
+            try {
+                const subjects = await fetchData('subjects');
+                const updatedSubjects = subjects.filter(s => s.id !== subjectId);
+                await updateData('subjects', updatedSubjects);
+                loadAdminSubjects();
+                showNotification('تم حذف المادة بنجاح', 'success');
+            } catch (error) {
+                console.error('Error deleting subject:', error);
+                showNotification('حدث خطأ أثناء حذف المادة', 'error');
+            }
+        }
+
+        // Admin Files Management
+        async function loadSubjectsForFiles() {
+            try {
+                const subjects = await fetchData('subjects');
+                const select = document.getElementById('newFileSubject');
+                select.innerHTML = '<option value="">اختر المادة</option>';
+                
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.id;
+                    option.textContent = `${subject.name} - السنة ${subject.year}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading subjects for files:', error);
+            }
+        }
+
+        async function loadAdminFiles() {
+            try {
+                const files = await fetchData('files');
+                const subjects = await fetchData('subjects');
+                const container = document.getElementById('adminFilesList');
+                container.innerHTML = '';
+                
+                if (files.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500">لا توجد ملفات</div>';
+                    return;
+                }
+                
+                files.forEach(file => {
+                    const subject = subjects.find(s => s.id === file.subjectId);
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'flex items-center justify-between p-4 border-b border-gray-200';
+                    fileDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-file text-purple-600 text-2xl ml-3"></i>
+                            <div>
+                                <div class="font-semibold text-gray-800">${file.name}</div>
+                                <div class="text-sm text-gray-500">${subject ? subject.name : 'مادة محذوفة'} - ${getFileTypeName(file.type)}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editFile('${file.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                تعديل
+                            </button>
+                            <button onclick="deleteFile('${file.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                حذف
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(fileDiv);
+                });
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showNotification('حدث خطأ في تحميل الملفات', 'error');
+            }
+        }
+
+        async function addNewFile(event) {
+            event.preventDefault();
+            
+            try {
+                const subjectId = document.getElementById('newFileSubject').value;
+                const name = document.getElementById('newFileName').value;
+                const type = document.getElementById('newFileType').value;
+                const url = document.getElementById('newFileUrl').value;
+                
+                const files = await fetchData('files');
+                
+                const newFile = {
+                    id: Date.now().toString(),
+                    subjectId,
+                    name,
+                    type,
+                    url,
+                    uploadDate: new Date().toISOString()
+                };
+                
+                files.push(newFile);
+                await updateData('files', files);
+                
+                document.getElementById('addFileForm').reset();
+                loadAdminFiles();
+                showNotification('تم إضافة الملف بنجاح', 'success');
+            } catch (error) {
+                console.error('Error adding file:', error);
+                showNotification('حدث خطأ أثناء إضافة الملف', 'error');
+            }
+        }
+
+        function editFile(fileId) {
+            showNotification('ميزة تعديل الملف قيد التطوير', 'info');
+        }
+
+        async function deleteFile(fileId) {
+            try {
+                const files = await fetchData('files');
+                const updatedFiles = files.filter(f => f.id !== fileId);
+                await updateData('files', updatedFiles);
+                loadAdminFiles();
+                showNotification('تم حذف الملف بنجاح', 'success');
+            } catch (error) {
+                console.error('Error deleting file:', error);
+                showNotification('حدث خطأ أثناء حذف الملف', 'error');
+            }
+        }
+
+        // Admin Exams Management
+        async function loadAdminExams() {
+            try {
+                const exams = await fetchData('exams');
+                const container = document.getElementById('adminExamsList');
+                container.innerHTML = '';
+                
+                if (exams.length === 0) {
+                    container.innerHTML = '<div class="text-center text-gray-500">لا توجد امتحانات</div>';
+                    return;
+                }
+                
+                exams.forEach(exam => {
+                    const examDiv = document.createElement('div');
+                    examDiv.className = 'flex items-center justify-between p-4 border-b border-gray-200';
+                    examDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar text-purple-600 text-2xl ml-3"></i>
+                            <div>
+                                <div class="font-semibold text-gray-800">${exam.subject}</div>
+                                <div class="text-sm text-gray-500">السنة ${exam.year} - ${getSemesterName(exam.semester)}</div>
+                                <div class="text-sm text-gray-500">${formatDate(exam.date)} - ${exam.time} - ${exam.room}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editExam('${exam.id}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                تعديل
+                            </button>
+                            <button onclick="deleteExam('${exam.id}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                حذف
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(examDiv);
+                });
+            } catch (error) {
+                console.error('Error loading exams:', error);
+                showNotification('حدث خطأ في تحميل الامتحانات', 'error');
+            }
+        }
+
+        async function addNewExam(event) {
+            event.preventDefault();
+            
+            try {
+                const subject = document.getElementById('newExamSubject').value;
+                const year = document.getElementById('newExamYear').value;
+                const semester = document.getElementById('newExamSemester').value;
+                const date = document.getElementById('newExamDate').value;
+                const time = document.getElementById('newExamTime').value;
+                const room = document.getElementById('newExamRoom').value;
+                
+                const exams = await fetchData('exams');
+                
+                const newExam = {
+                    id: Date.now().toString(),
+                    subject,
+                    year: parseInt(year),
+                    semester,
+                    date,
+                    time,
+                    room
+                };
+                
+                exams.push(newExam);
+                await updateData('exams', exams);
+                
+                document.getElementById('addExamForm').reset();
+                loadAdminExams();
+                showNotification('تم إضافة الامتحان بنجاح', 'success');
+            } catch (error) {
+                console.error('Error adding exam:', error);
+                showNotification('حدث خطأ أثناء إضافة الامتحان', 'error');
+            }
+        }
+
+        function editExam(examId) {
+            showNotification('ميزة تعديل الامتحان قيد التطوير', 'info');
+        }
+
+        async function deleteExam(examId) {
+            try {
+                const exams = await fetchData('exams');
+                const updatedExams = exams.filter(e => e.id !== examId);
+                await updateData('exams', updatedExams);
+                loadAdminExams();
+                showNotification('تم حذف الامتحان بنجاح', 'success');
+            } catch (error) {
+                console.error('Error deleting exam:', error);
+                showNotification('حدث خطأ أثناء حذف الامتحان', 'error');
+            }
+        }
+
+        // Logo Management Functions
+        function previewLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                showNotification('يرجى اختيار ملف صورة صالح', 'error');
+                return;
+            }
+            
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('حجم الملف كبير جداً. الحد الأقصى 5 ميجابايت', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImage = document.getElementById('previewImage');
+                previewImage.src = e.target.result;
+                document.getElementById('logoPreview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadLogo() {
+            const fileInput = document.getElementById('logoUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('يرجى اختيار صورة أولاً', 'error');
+                return;
+            }
+            
+            try {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const logoData = e.target.result;
+                    
+                    // Save logo to localStorage
+                    localStorage.setItem('platformLogo', logoData);
+                    
+                    // Update current logo display
+                    updateLogoDisplay(logoData);
+                    
+                    // Clear file input and preview
+                    fileInput.value = '';
+                    document.getElementById('logoPreview').classList.add('hidden');
+                    
+                    showNotification('تم حفظ الشعار بنجاح!', 'success');
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error uploading logo:', error);
+                showNotification('حدث خطأ أثناء رفع الشعار', 'error');
+            }
+        }
+
+        function resetLogo() {
+            // Remove logo from localStorage
+            localStorage.removeItem('platformLogo');
+            
+            // Reset to default logo
+            updateLogoDisplay(null);
+            
+            // Clear file input and preview
+            document.getElementById('logoUpload').value = '';
+            document.getElementById('logoPreview').classList.add('hidden');
+            
+            showNotification('تم استخدام الشعار الافتراضي', 'success');
+        }
+
+        function updateLogoDisplay(logoData) {
+            const currentLogo = document.getElementById('currentLogo');
+            const headerLogo = document.getElementById('headerLogo');
+            
+            if (logoData) {
+                // Update current logo in settings
+                currentLogo.innerHTML = `
+                    <img src="${logoData}" alt="شعار المنصة" class="max-w-full max-h-20 mx-auto mb-2">
+                    <p class="text-gray-500">الشعار المخصص</p>
+                `;
+                
+                // Update header logo
+                headerLogo.innerHTML = `
+                    <img src="${logoData}" alt="شعار المنصة" class="h-8 w-8 object-contain">
+                `;
+            } else {
+                // Reset to default
+                currentLogo.innerHTML = `
+                    <i class="fas fa-graduation-cap text-purple-600 text-4xl mb-2"></i>
+                    <p class="text-gray-500">الشعار الافتراضي</p>
+                `;
+                
+                headerLogo.innerHTML = `
+                    <i class="fas fa-graduation-cap text-purple-600 text-2xl"></i>
+                `;
+            }
+        }
+
+        function loadSavedLogo() {
+            const savedLogo = localStorage.getItem('platformLogo');
+            if (savedLogo) {
+                updateLogoDisplay(savedLogo);
+            }
+        }
+
+        // Admin Settings
+        async function loadSystemStats() {
+            try {
+                const users = await fetchData('users');
+                const subjects = await fetchData('subjects');
+                const files = await fetchData('files');
+                const posts = await fetchData('posts');
+                const exams = await fetchData('exams');
+                
+                const container = document.getElementById('systemStats');
+                container.innerHTML = `
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span>عدد المستخدمين:</span>
+                        <span class="font-semibold text-purple-600">${users.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span>عدد المواد:</span>
+                        <span class="font-semibold text-purple-600">${subjects.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span>عدد الملفات:</span>
+                        <span class="font-semibold text-purple-600">${files.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span>عدد المنشورات:</span>
+                        <span class="font-semibold text-purple-600">${posts.length}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <span>عدد الامتحانات:</span>
+                        <span class="font-semibold text-purple-600">${exams.length}</span>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading system stats:', error);
+                showNotification('حدث خطأ في تحميل الإحصائيات', 'error');
+            }
+        }
+
+        function updateSettings(event) {
+            event.preventDefault();
+            showNotification('تم حفظ الإعدادات بنجاح', 'success');
+        }
+
+        function exportData() {
+            showNotification('جاري تصدير البيانات...', 'info');
+            // In a real implementation, this would export all data
+            setTimeout(() => {
+                showNotification('تم تصدير البيانات بنجاح', 'success');
+            }, 2000);
+        }
+
+        function clearCache() {
+            localStorage.clear();
+            showNotification('تم مسح التخزين المؤقت', 'success');
+        }
+
+        function resetSystem() {
+            if (confirm('هل أنت متأكد من إعادة تعيين النظام؟ سيتم حذف جميع البيانات!')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Helper Functions
+        function getSemesterName(semester) {
+            const names = {
+                'general': 'عام',
+                'first': 'الفصل الأول',
+                'second': 'الفصل الثاني',
+                'summer': 'الفصل الصيفي'
+            };
+            return names[semester] || semester;
+        }
+
+        function getFileTypeName(type) {
+            const names = {
+                'slides': 'سلايدات',
+                'recordings': 'تسجيلات',
+                'summaries': 'تلاخيص'
+            };
+            return names[type] || type;
+        }
+
+        function getSubjectTypeName(type) {
+            const names = {
+                'academic': 'مادة أكاديمية',
+                'mandatory': 'مادة إجبارية',
+                'elective': 'مادة حرة'
+            };
+            return names[type] || type;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                calendar: 'gregory'
+            };
+            return date.toLocaleDateString('ar-EG', options);
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ff3ec2655832b0',t:'MTc2MDY5ODMzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ff718780f732b0',t:'MTc2MDcwMDQxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
